@@ -45,15 +45,15 @@ FaultGuard-AI solves these problems by achieving end-to-end fault diagnosis thro
 FaultGuard-AI is structured as a parent orchestrator that integrates the core research engine via a tracked Git Submodule (`chimera`):
 
 ```
-FaultGuard-AI  (Parent Orchestrator)
- ├─ .gitmodules       # Submodule configuration
- ├─ README.md         # Parent master system documentation (This file)
- ├─ LICENSE           # System license
- └─ chimera/          # [Submodule] Core Research Engine (Forked & Optimized)
-     ├─ src/          # Multi-task expansion & domain adaptation models
-     ├─ scripts/      # Best checkpoint selectors & comparison plotters
+FaultGuard-AI (Parent Orchestrator)
+ ├─ .gitmodules # Submodule configuration
+ ├─ README.md # Parent master system documentation (This file)
+ ├─ LICENSE # System license
+ └─ chimera/ # [Submodule] Core Research Engine (Forked & Optimized)
+     ├─ src/ # Multi-task expansion & domain adaptation models
+     ├─ scripts/ # Best checkpoint selectors & comparison plotters
      ├─ report_output/# Evaluated summaries, charts, and metrics
-     └─ main.py       # Training and evaluation entrypoint
+     └─ main.py # Training and evaluation entrypoint
 ```
 
 ---
