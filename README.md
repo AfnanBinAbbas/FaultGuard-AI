@@ -1,59 +1,46 @@
 # FaultGuard-AI: Next-Gen Log-Based Fault Diagnosis System
 
-FaultGuard-AI is a State-of-the-Art, End-to-End Fault Diagnosis Platform with Cross-Domain Adaptation, 6 Diagnostic Tasks, and Dynamic Multi-Task Interaction. 
+FaultGuard-AI is a State-of-the-Art, End-to-End Fault Diagnosis Platform with Cross-Domain Adaptation, 6 Diagnostic Tasks, and Dynamic Multi-Task Interaction.
 
 It is built on top of the interactive multi-task learning architecture proposed in the research paper: *United We Stand: Towards End-to-End Log-based Fault Diagnosis via Interactive Multi-Task Learning* (ASE 2025).
 
----
-
-## Table of Contents
-
-- [Description](#description)
-- [Key Features](#key-features)
-- [System Architecture](#system-architecture)
-- [Datasets](#datasets)
-- [Environment](#environment)
-- [Preparation](#preparation)
-- [Quick Start Guide](#quick-start-guide)
-- [Reproducibility and Outputs](#reproducibility-and-outputs)
-- [License](#license)
+For detailed code architecture, class/method deep-dives, and implementation logic, please refer to [Documentation.md](Documentation.md).
 
 ---
 
-## Description
+## Performance Evaluation & Comparison
 
-Log-based fault diagnosis is essential for maintaining software system availability. However, traditional fault diagnosis methods are built in a task-independent manner, which fails to bridge the gap between anomaly detection (AD) and root cause localization (RCL) in terms of data form and diagnostic objectives. This creates three major issues:
-1. Diagnostic bias accumulates in the pipeline.
-2. System deployment relies on expensive, fully labeled monitoring data.
-3. The collaborative relationship and knowledge sharing between diagnostic tasks is overlooked.
+The following table summarizes the BGL evaluation results comparing the **Original Paper** (the reference implementation of the repository you forked from) against our optimized baseline and implemented novelties.
 
-FaultGuard-AI solves these problems by achieving end-to-end fault diagnosis through bidirectional interaction and knowledge transfer between anomaly detection and root cause localization. It carefully designs interaction strategies between AD and RCL at the data, feature, and diagnostic result levels, thereby achieving both sub-tasks interactively within a unified, end-to-end multi-task learning framework.
+| Model Variant | AD Precision | AD Recall | AD F1 Score | RCA HR@1 | RCA MRR@20 | Performance Delta vs. Paper |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Original Paper (Fork Reference)** | 0.912 | 0.974 | 0.942 | 0.897 | 0.912 | *Baseline reference* |
+| **Our Baseline Implementation** | 0.939 | 0.985 | 0.962 | 0.876 | 0.917 | AD F1: **+2.0%** / RCA MRR: **+0.5%** |
+| **Novelty 1: Domain-Adaptive** | 0.723 | 0.791 | 0.756 | 0.700 | 0.713 | *Optimized for cross-domain* |
+| **Novelty 2: Multi-Task Expansion** | **0.960** | 0.979 | **0.969** | **0.949** | **0.959** | AD F1: **+2.7%** / RCA MRR: **+4.7%** |
+| **Novelty 3: Advanced Interaction** | 0.948 | **0.985** | 0.966 | 0.876 | 0.909 | AD F1: **+2.4%** / RCA MRR: **-0.3%** |
 
----
-
-## Key Features
-
-- **Interactive Multi-Task Learning:** Enables bidirectional interaction and knowledge sharing between anomaly detection and root cause localization.
-- **Cross-Domain Adaptation:** Fully integrated domain-adaptation layers allowing robust models to perform diagnostics across varying system environments.
-- **6 Concurrent Diagnostic Tasks:** Scaled up from standard systems to coordinate six distinct diagnostic and classification tasks simultaneously (Multitask Expansion).
-- **AI-Driven Weight Automation:** Dynamically balances task weight distributions during training, achieving a **65% to 75% performance gain** over baseline independent systems.
+### Key Takeaways
+- **Novelty 2 (Multi-Task Expansion)** achieved the strongest overall performance, surpassing the original paper by **2.7% in Anomaly Detection (AD) F1** and **4.7% in Root Cause Localization (RCA) MRR**.
+- The baseline implementation improves on anomaly detection precision and recall over the paper's default configuration.
+- Auxiliary task heads (failure type, remediation advice, and impact severity) introduced in Novelties 2 and 3 successfully extract deep contextual signal patterns directly from unstructured log messages.
 
 ---
 
 ## System Architecture
 
-FaultGuard-AI is structured as a parent orchestrator that integrates the core research engine via a tracked Git Submodule (`chimera`):
+FaultGuard-AI is structured as a parent orchestrator that integrates the core research engine via a tracked Git Submodule (chimera):
 
 ```
-FaultGuard-AI (Parent Orchestrator)
- ├─ .gitmodules # Submodule configuration
- ├─ README.md # Parent master system documentation (This file)
- ├─ LICENSE # System license
- └─ chimera/ # [Submodule] Core Research Engine (Forked & Optimized)
-     ├─ src/ # Multi-task expansion & domain adaptation models
-     ├─ scripts/ # Best checkpoint selectors & comparison plotters
+FaultGuard-AI  (Parent Orchestrator)
+ ├─ README.md         # Parent master system documentation (This file)
+ ├─ Documentation.md  # Comprehensive technical documentation & function reference
+ ├─ LICENSE           # System license
+ └─ chimera/          # [Submodule] Core Research Engine (Forked & Optimized)
+     ├─ src/          # Multi-task expansion & domain adaptation models
+     ├─ scripts/      # Best checkpoint selectors & comparison plotters
      ├─ report_output/# Evaluated summaries, charts, and metrics
-     └─ main.py # Training and evaluation entrypoint
+     └─ main.py       # Training and evaluation entrypoint
 ```
 
 ---
@@ -71,57 +58,35 @@ We utilize two major open-source log datasets for evaluation:
 
 ---
 
-## Environment
-
-The core engine requires the following key python packages:
-
-- numpy>=1.20.3,<2.0.0
-- pandas==1.3.5
-- matplotlib
-- pytorch_lightning==1.1.2
-- scikit-learn>=1.0.2,<1.1.0
-- torch>=1.13.1
-- tqdm==4.62.3
-- overrides
-- [Drain3](https://github.com/IBM/Drain3) (Log parsing)
-
----
-
-## Preparation
-
-To completely run the FaultGuard-AI training and evaluation pipelines:
-
-1. **Step 1:** Download the datasets from the links above and place the log files under the `chimera/data/` folder.
-2. **Step 2:** Parse the unstructured logs using Drain3.
-3. **Step 3:** Download `glove.6B.300d.txt` from [Stanford NLP word embeddings](https://nlp.stanford.edu/projects/glove/) and place it under the `chimera/glove/` folder.
-
----
-
 ## Quick Start Guide
 
 ### 1. Preparing the Environment
-Enter the core research directory and install the required dependencies:
+Clone the repository recursively, enter the core research directory, and install the required dependencies:
 ```bash
-cd chimera
+git clone --recursive https://github.com/AfnanBinAbbas/FaultGuard-AI.git
+cd FaultGuard-AI/chimera
 pip install -r requirements.txt
 ```
 
-### 2. Training the Model
-Train the unified model on the BGL dataset for 150 epochs with dynamic task weights and automated validation checkpointing:
+### 2. Preparing Datasets
+1. Download the datasets from the Usenix links above and place the log files under the `chimera/data/` folder.
+2. Download `glove.6B.300d.txt` from [Stanford NLP word embeddings](https://nlp.stanford.edu/projects/glove/) and place it under the `chimera/glove/` folder.
+
+### 3. Running Training
+Train a model variant on the BGL dataset for 150 epochs:
 ```bash
-python main.py --mode train --dataset BGL --epochs 150 --batch_size 256
+# Example: Train Novelty 2 (Multi-Task Expansion)
+python main.py --mode novelty2_train --dataset BGL --epochs 150 --batch_size 256
 ```
 
-### 3. Dynamic Checkpoint Selection
-After training is complete, automatically evaluate all saved checkpoints in the history and copy the best performing model to `checkpoint/best_model.bin`:
+### 4. Dynamic Checkpoint Selection & Evaluation
+Evaluate all saved checkpoints in the history, copy the best performing model to `checkpoint/best_model.bin`, and run final evaluation:
 ```bash
+# 1. Run best checkpoint selector script
 python scripts/select_best_checkpoint.py --dataset BGL --device cpu --batch-size 128 --checkpoint-dir checkpoint
-```
 
-### 4. Model Evaluation
-Evaluate the selected best model on the BGL dataset:
-```bash
-python main.py --mode eval --load_checkpoint True --dataset BGL
+# 2. Evaluate the selected model
+python main.py --mode novelty2_eval --load_checkpoint True --dataset BGL
 ```
 
 ### 5. Generate Comparison Plots
@@ -129,21 +94,13 @@ Generate the paper-vs-our-run comparison and the auxiliary-head comparison figur
 ```bash
 python scripts/plot_paper_comparison.py
 ```
-
-Generated figures are stored under `chimera/report_output/`:
-- `fig_bgl_paper_vs_novelties.png`
-- `fig_bgl_novelty_auxiliary_heads.png`
+Generated plots are stored under `chimera/report_output/`.
 
 ---
 
-## Reproducibility and Outputs
+## Technical Deep-Dive
 
-The repository contains a full, reproducible, BGL-only research flow with dynamic checkpoint selection and comparison plots.
-
-- **Latest Test Results:** See [chimera/TEST_RESULTS.md](chimera/TEST_RESULTS.md) for the freshly generated evaluation results, plots, and checkpoint selection output from the latest test run.
-- **Implemented Novelties:** See [chimera/NOVELTIES.md](chimera/NOVELTIES.md) for the full description of the three implemented novelty modules, their code locations, and BGL results.
-- **Command Reference:** For a complete list of runnable commands, modes, and flags, see [chimera/docs/COMMANDS.md](chimera/docs/COMMANDS.md).
-- **Main Report:** The complete human-readable summary lives in [chimera/report_output/PROJECT_REPORT.md](chimera/report_output/PROJECT_REPORT.md).
+For a complete breakdown of code modules, functions, algorithms, and logical flow, please see the [Documentation.md](Documentation.md) file at the root of the repository.
 
 ---
 
