@@ -25,6 +25,14 @@ The following table summarizes the BGL evaluation results comparing the **Origin
 - The baseline implementation improves on anomaly detection precision and recall over the paper's default configuration.
 - Auxiliary task heads (failure type, remediation advice, and impact severity) introduced in Novelties 2 and 3 successfully extract deep contextual signal patterns directly from unstructured log messages.
 
+### Visualized Evaluation Results
+
+#### Paper vs. Novelty Performance Comparison
+![Paper vs. Novelty Performance Comparison](chimera/report_output/fig_bgl_paper_vs_novelties.png)
+
+#### Model Training & Validation Loss
+![Model Training & Validation Loss](chimera/report_output/fig_validation_loss.png)
+
 ---
 
 ## System Architecture
